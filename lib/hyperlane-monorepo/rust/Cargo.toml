@@ -1,0 +1,20 @@
+cargo-features = ["edition2021"]
+
+[workspace]
+
+members = [
+    "agents/relayer",
+    "agents/scraper",
+    "agents/validator",
+    "chains/hyperlane-ethereum",
+    "chains/hyperlane-fuel",
+    "ethers-prometheus",
+    "gelato",
+    "hyperlane-base",
+    "hyperlane-core",
+    "hyperlane-test",
+    "utils/abigen",
+    "utils/backtrace-oneline",
+    "utils/hex",
+    "utils/run-locally",
+]

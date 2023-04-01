@@ -1,0 +1,41 @@
+{
+  "name": "@hyperlane-xyz/monorepo",
+  "description": "A yarn workspace of core Hyperlane packages",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^3.2.0",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "eslint": "^8.16.0",
+    "eslint-config-prettier": "^8.5.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^12.4.3",
+    "prettier": "^2.4.1"
+  },
+  "packageManager": "yarn@3.2.0",
+  "private": true,
+  "scripts": {
+    "build": "yarn workspaces foreach --verbose --parallel --topological run build",
+    "clean": "yarn workspaces foreach --verbose --parallel run clean",
+    "postinstall": "husky install",
+    "prettier": "yarn workspaces foreach --verbose --parallel run prettier",
+    "lint-ts": "eslint . --ext .ts",
+    "test": "yarn workspaces foreach --verbose --parallel run test",
+    "version:check": "yarn version check --interactive",
+    "version:prepare": "yarn workspaces foreach --no-private --verbose --topological version --immediate",
+    "publish:all": "yarn workspaces foreach --no-private --verbose --topological npm publish --access public"
+  },
+  "workspaces": [
+    "solidity",
+    "typescript/*"
+  ],
+  "resolutions": {
+    "async": "^2.6.4",
+    "fetch-ponyfill": "^7.1",
+    "flat": "^5.0.2",
+    "lodash": "^4.17.21",
+    "recursive-readdir": "^2.2.3",
+    "underscore": "^1.13",
+    "undici": "^5.11"
+  }
+}

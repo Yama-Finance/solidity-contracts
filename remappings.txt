@@ -1,0 +1,4 @@
+@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+@hyperlane-xyz/=lib/hyperlane-monorepo/solidity/
+@prb/math/=lib/prb-math/

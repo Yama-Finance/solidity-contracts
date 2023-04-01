@@ -1,0 +1,15 @@
+{{- if .Values.hyperlane.validator.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "agent-common.fullname" . }}-validator
+  labels:
+    {{- include "agent-common.labels" . | nindent 4 }}
+data:
+{{ $index := 0 }}
+{{- range .Values.hyperlane.validator.configs }}
+  validator-{{ $index }}.env: |
+{{- include "agent-common.config-env-vars" (dict "config" . "agent_name" "validator" "format" "dot_env") | indent 4 }}
+{{ $index = add1 $index }}
+{{- end }}
+{{- end }}
