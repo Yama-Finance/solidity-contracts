@@ -23,6 +23,17 @@ interface IRewardRouter {
     ) external returns (uint256);
 }
 
+/// @notice A Curve pool
+interface ICurvePool {
+    function exchange(
+        int128 i,
+        int128 j,
+        uint256 dx,
+        uint256 min_dy,
+        address receiver
+    ) external returns (uint256);
+}
+
 /// @notice Swaps mooGLP to Yama and vice versa
 contract MooGLPSwapper is ISwapper {
     YSS public yama;
@@ -31,7 +42,9 @@ contract MooGLPSwapper is ISwapper {
     address public constant glpManager = 0x3963FfC9dff443c2A94f21b129D429891E32ec18;
     PegStabilityModule public psm;
     IERC20 public constant usdt = IERC20(0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9);
+    IERC20 public constant usdc = IERC20(0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8);
     IBeefyVault public constant beefyVault = IBeefyVault(0x9dbbBaecACEDf53d5Caa295b8293c1def2055Adc);
+    ICurvePool public constant curvePool = ICurvePool(0x7f90122BF0700F9E7e1F688fe926940E8839F353);
 
     constructor(
         YSS _yama,
@@ -52,8 +65,10 @@ contract MooGLPSwapper is ISwapper {
         beefyVault.transferFrom(msg.sender, address(this), collateralAmount);
         beefyVault.withdraw(collateralAmount);
         uint256 glpAmount = sGLP.balanceOf(address(this));
-        uint256 usdtAmount = rewardRouter.unstakeAndRedeemGlp(
-            address(usdt), glpAmount, 0, address(this));
+        uint256 usdcAmount = rewardRouter.unstakeAndRedeemGlp(
+            address(usdc), glpAmount, 0, address(this));
+        usdc.approve(address(curvePool), usdcAmount);
+        uint256 usdtAmount = curvePool.exchange(0, 1, usdcAmount, 0, address(this));
         usdt.approve(address(psm), usdtAmount);
         outputAmount = psm.deposit(usdtAmount);
         checkOutputAmount(minOutputAmount, outputAmount);
