@@ -86,8 +86,22 @@ contract MooGLPSwapper is ISwapper {
         yama.transferFrom(msg.sender, address(this), yamaAmount);
         uint256 usdtAmount = psm.withdraw(yamaAmount);
         usdt.approve(glpManager, usdtAmount);
-        uint256 glpAmount = rewardRouter.mintAndStakeGlp(
-            address(usdt), usdtAmount, 0, 0);
+        try rewardRouter.mintAndStakeGlp(address(usdt), usdtAmount, 0, 0) returns (uint256 glpAmount) {
+            return processGlp(glpAmount, minOutputAmount);
+        } catch {
+            usdt.approve(address(curvePool), usdtAmount);
+            uint256 usdcAmount = curvePool.exchange(1, 0, usdtAmount, 0, address(this));
+            usdc.approve(glpManager, usdcAmount);
+            uint256 glpAmount = rewardRouter.mintAndStakeGlp(
+                address(usdc), usdcAmount, 0, 0);
+            return processGlp(glpAmount, minOutputAmount);
+        }
+    }
+
+    function processGlp(
+        uint256 glpAmount,
+        uint256 minOutputAmount
+    ) internal returns (uint256 outputAmount) {
         sGLP.approve(address(beefyVault), glpAmount);
         beefyVault.deposit(glpAmount);
         outputAmount = beefyVault.balanceOf(address(this));
